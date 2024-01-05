@@ -1,49 +1,53 @@
 package com.studnetMgtsys.Demo.controller;
 
-import com.studnetMgtsys.Demo.dto.AddStudentDTO;
-import com.studnetMgtsys.Demo.dto.GetStudentDTO;
+import com.studnetMgtsys.Demo.dto.StudentDTO;
 import com.studnetMgtsys.Demo.entity.Student;
 import com.studnetMgtsys.Demo.service.StudentService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping(path="/student")
+@RequestMapping(path="/students")
 public class StudentController {
 
-    @Autowired
     private StudentService studentService;
 
-    //find all student end point
+    public StudentController(StudentService studentService){
+        this.studentService = studentService;
+    }
+
     @GetMapping
-    public List<GetStudentDTO> findAllStudent(){
-        return studentService.findAllStudent();
+    public ResponseEntity<List<StudentDTO>> findAllStudent(){
+        return ResponseEntity.ok(studentService.findAllStudent());
     }
 
-    //find student by id end point
     @GetMapping(path="/{id}")
-    public GetStudentDTO findStudentById(@PathVariable("id")Long id){
-        return studentService.findStudentById(id);
+    public ResponseEntity<StudentDTO> findStudentById(@PathVariable("id")Long id){
+
+        StudentDTO findByIdStudentDTO = studentService.findStudentById(id);
+        return ResponseEntity.ok(findByIdStudentDTO);
     }
 
-    //add student data end point
+
     @PostMapping
-    public AddStudentDTO addStudent(@RequestBody Student student){
-        return studentService.addStudent(student);
+    public ResponseEntity<StudentDTO> addStudent(@RequestBody Student student){
+        StudentDTO saveStudentDTO = studentService.addStudent(student);
+        return new ResponseEntity<>(saveStudentDTO, HttpStatus.CREATED);
     }
 
-    //update a student
     @PutMapping(path="/{id}")
-    public AddStudentDTO updateStudent(@PathVariable("id")Long id, @RequestBody Student student){
-        return studentService.updateStudent(id,student);
+    public ResponseEntity<StudentDTO> updateStudent(@PathVariable("id")Long id, @RequestBody Student student){
+        StudentDTO updateStudentDTO = studentService.updateStudent(id,student);
+        return ResponseEntity.ok(updateStudentDTO);
     }
 
-    //delete student from database
     @DeleteMapping(path="/{id}")
-    public void deleteStudent(@PathVariable("id")Long id){
-        studentService.deleteStudent(id);
+    public ResponseEntity<String> deleteStudent(@PathVariable("id")Long id){
+        String res = studentService.deleteStudent(id);
+        return ResponseEntity.ok(res);
     }
 
 }

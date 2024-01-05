@@ -1,11 +1,11 @@
 package com.studnetMgtsys.Demo.service.impl;
 
-import com.studnetMgtsys.Demo.dto.AddStudentDTO;
-import com.studnetMgtsys.Demo.dto.GetStudentDTO;
+import com.studnetMgtsys.Demo.dto.StudentDTO;
+import com.studnetMgtsys.Demo.dto.StudentDTOMapper;
 import com.studnetMgtsys.Demo.entity.Student;
 import com.studnetMgtsys.Demo.repository.StudentRepository;
 import com.studnetMgtsys.Demo.service.StudentService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,71 +15,60 @@ import java.util.stream.Collectors;
 @Service
 public class StudentServiceImpl implements StudentService {
 
-    @Autowired
     private StudentRepository studentRepository;
-    //---------------------------------------------------
-    //find all students details through DTO
-    public List<GetStudentDTO> findAllStudent(){
+    private StudentDTOMapper studentDTOMapper;
+
+    public StudentServiceImpl(StudentRepository studentRepository, StudentDTOMapper studentDTOMapper){
+        this.studentRepository = studentRepository;
+        this.studentDTOMapper= studentDTOMapper;
+    }
+
+    public List<StudentDTO> findAllStudent(){
         List<Student> studentList = studentRepository.findAll();
 
-        return studentList.stream()
-                .map(this::fromEntityToStudentDTO)
+        List<StudentDTO> findAllStudentDTO = studentList.stream()
+                .map(StudentDTOMapper::findStudent)
                 .collect(Collectors.toList());
+
+        return findAllStudentDTO;
     }
 
-    //find student by ID through ID via DTO
-    public GetStudentDTO findStudentById(Long id){
+    public StudentDTO findStudentById(Long id){
         Optional<Student> oneStudent = studentRepository.findById(id);
 
-        return oneStudent.stream()
-                .map(this::fromEntityToStudentDTO)
+        StudentDTO fineOneStudentDTO = oneStudent.stream()
+                .map(StudentDTOMapper::findStudent)
                 .findFirst()
                 .orElse(null);
+
+        return fineOneStudentDTO;
     }
 
-    //use this to MAP
-    public GetStudentDTO fromEntityToStudentDTO(Student student){
-        return new GetStudentDTO(
-                student.getFirstName(),
-                student.getLastName(),
-                student.getEmail(),
-                student.getAge()
-        );
-    }
-
-    //-----------------------------------------
-    //when register student,filter out
-    public AddStudentDTO fromEntityToAddStudentDTO(Student student){
-        return new AddStudentDTO(
-                student.getId(),
-                student.getFirstName(),
-                student.getLastName(),
-                student.getEmail()
-        );
-    }
-
-    //to add a student to database through DTO
-    public AddStudentDTO addStudent(Student student){
+    public StudentDTO addStudent(Student student){
         Student addedStudent = studentRepository.save(student);
 
-        return fromEntityToAddStudentDTO(addedStudent);
+        StudentDTO addedstudentDTO = studentDTOMapper.addStudent(addedStudent);
+
+        return addedstudentDTO;
     }
 
-    //to update a student in database through DTO
-    public AddStudentDTO updateStudent(Long id,Student student){
+    public StudentDTO updateStudent(Long id,Student student){
 
         student.setId(id);
         Student updateStudent = studentRepository.save(student);
 
-        return fromEntityToAddStudentDTO(updateStudent);
-    }
-    //------------------------------------------------------
-    //to delete a student
-    public void deleteStudent(Long id){
-        studentRepository.deleteById(id);
+        StudentDTO updateStudentDTO = studentDTOMapper.addStudent(student);
+
+        return updateStudentDTO;
     }
 
-
-
+    public String deleteStudent(Long id) throws EntityNotFoundException{
+        if(studentRepository.existsById(id)){
+            studentRepository.deleteById(id);
+            return "id found and "+id+" deleted ";
+        }else{
+            return "id "+ id+ " not found";
+        }
+    }
 }
 
