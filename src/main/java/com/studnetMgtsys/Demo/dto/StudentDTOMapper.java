@@ -8,7 +8,7 @@ public class StudentDTOMapper {
 
     public StudentDTO addStudent(Student student) {
         return new StudentDTO(
-                student.getId(),
+                student.getStudentId(),
                 student.getFirstName(),
                 student.getLastName(),
                 student.getEmail()

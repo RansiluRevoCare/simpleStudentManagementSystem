@@ -54,7 +54,7 @@ public class StudentServiceImpl implements StudentService {
 
     public StudentDTO updateStudent(Long id,Student student){
 
-        student.setId(id);
+        student.setStudentId(id);
         Student updateStudent = studentRepository.save(student);
 
         StudentDTO updateStudentDTO = studentDTOMapper.addStudent(student);

@@ -1,6 +1,7 @@
 package com.studnetMgtsys.Demo.controller;
 
 import com.studnetMgtsys.Demo.dto.StudentDTO;
+import com.studnetMgtsys.Demo.entity.Degree;
 import com.studnetMgtsys.Demo.entity.Student;
 import com.studnetMgtsys.Demo.service.StudentService;
 import org.springframework.http.HttpStatus;
@@ -30,7 +31,6 @@ public class StudentController {
         StudentDTO findByIdStudentDTO = studentService.findStudentById(id);
         return ResponseEntity.ok(findByIdStudentDTO);
     }
-
 
     @PostMapping
     public ResponseEntity<StudentDTO> addStudent(@RequestBody Student student){

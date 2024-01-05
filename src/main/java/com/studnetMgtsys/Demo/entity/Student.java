@@ -2,11 +2,11 @@ package com.studnetMgtsys.Demo.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.List;
 
 @Entity
 @Table
@@ -21,8 +21,7 @@ public class Student {
             allocationSize = 1
     )
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "student_sequence")
-    @Column(name="student_id")
-    private Long id;
+    private Long studentId;
 
     @Column(nullable = false)
     private String firstName;
@@ -42,12 +41,54 @@ public class Student {
     @Column(nullable = false)
     private String password;
 
-    public Long getId() {
-        return id;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(
+            name="address_fk_id",
+            referencedColumnName = "addressId",
+            foreignKey = @ForeignKey(name="address_fk_id")
+    )
+    private StudentAddress studentAddress;
+
+    public StudentAddress getStudentAddress() {
+        return studentAddress;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setStudentAddress(StudentAddress studentAddress) {
+        this.studentAddress = studentAddress;
+    }
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(
+            name="degree_fk_id",
+            referencedColumnName = "degreeId"
+    )
+    private Degree degree;
+
+    public Degree getDegree() {
+        return degree;
+    }
+
+    public void setDegree(Degree degree) {
+        this.degree = degree;
+    }
+
+    @ManyToMany(mappedBy = "student")
+    private List<Subject> subject;
+
+    public List<Subject> getSubject() {
+        return subject;
+    }
+
+    public void setSubject(List<Subject> subject) {
+        this.subject = subject;
+    }
+
+    public Long getStudentId() {
+        return studentId;
+    }
+
+    public void setStudentId(Long id) {
+        this.studentId = id;
     }
 
     public String getFirstName() {
@@ -106,7 +147,7 @@ public class Student {
     @Override
     public String toString() {
         return "Student{" +
-                "id=" + id +
+                "id=" + studentId +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
@@ -115,6 +156,4 @@ public class Student {
                 ", password='" + password + '\'' +
                 '}';
     }
-
-
 }
